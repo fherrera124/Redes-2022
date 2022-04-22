@@ -1,8 +1,7 @@
 # Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import time
-
-from urllib import urlunquote
+import os
+import urllib
 
 
 hostName = "localhost"
@@ -12,7 +11,7 @@ serverPort = 8080
 class MyServer(BaseHTTPRequestHandler):
 
     def do_GET(self):
-        self.performReq(unlunquote(self.path).decode('utf-8'))
+        self.performReq(urllib.parse.unquote(self.path))
 
     def performReq(self, req):
         curDir = os.getcwd()
@@ -43,3 +42,4 @@ if __name__ == "__main__":
 
     webServer.server_close()
     print("Server stopped.")
+
