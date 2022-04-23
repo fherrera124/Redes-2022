@@ -1,9 +1,8 @@
-# Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import urllib
-import socket  # For gethostbyaddr()
-
+import socket
+from http import HTTPStatus
 
 hostName = "localhost"
 serverPort = 8010
@@ -12,8 +11,6 @@ serverPort = 8010
 class MyServer(BaseHTTPRequestHandler):
 
     metodos_validos = ('GET', 'POST', 'PUT', 'HEAD', 'DELETE', 'PATCH')
-
-   # metodos_permitidos = ('GET')
 
     def handle_one_request(self):
 
@@ -46,7 +43,12 @@ class MyServer(BaseHTTPRequestHandler):
             # a read or a write timed out.  Discard this connection
             self.log_error("Request timed out: %r", e)
             self.close_connection = True
-            return
+        return
+
+    
+
+
+
 
     def do_GET(self):
         self.performReq(urllib.parse.unquote(self.path))
@@ -68,6 +70,9 @@ class MyServer(BaseHTTPRequestHandler):
             print('no file '+fname)
             self.send_error(
                 code=404, message="A donde queres ir titan galactico?")
+
+
+
 
 
 if __name__ == "__main__":
