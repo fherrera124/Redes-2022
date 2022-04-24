@@ -1,3 +1,21 @@
+
+
+## Modo de uso:
+
+`python3 server.py `
+
+Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecutar:
+
+`python3 server.py 1.1`
+
+
+
+## Casos de prueba
+
+...
+
+## Enunciado
+
 12. (Ejercicio de promoción) Programar en el lenguaje que sea de su elección un servidor HTTP/1.0
 reducido que sólo implementará lo enumerado a continuación:
 NOTA: para quienes hagan la promoción, este será un ejercicio “entregable”. En la entrega deberán

@@ -17,17 +17,27 @@ class HTTPServer:
     por defecto mantiene la conexion de inactividad con el socket de 100 segundos
     """
 
-    # lo que el server asume si el cliente NO lo proporciona
-    default_request_version = "HTTP/1.0"
-    protocol_version = "HTTP/1.0"  # la version con la que trabaja el servidor siempre
-    timeout = 100  # cant de segundos de inactividad, None para infinito
-
-    def __init__(self, socket, host, port):
+    def __init__(self, socket, host, port, http_version="HTTP/1.0"):
 
         self.host = host
         self.port = port
         self.header = ''
         self.socket = socket
+
+        # lo que el server asume si el cliente NO lo proporciona
+        self.default_request_version = "HTTP/1.0"
+
+        # la version con la que trabaja el servidor siempre
+        if http_version in ('HTTP/1.0', 'HTTP/1.1'):
+            self.protocol_version = http_version
+        else:
+            self.protocol_version = "HTTP/1.0"
+
+        print("Protocolo: %s" % self.protocol_version)
+
+        # cant de segundos de inactividad, None para infinito
+        self.timeout = 100
+
         print("Esperando que se conecte un cliente")
         self.connection, self.address = self.socket.accept()  # blocking wait for client
         print("Cliente conectado")
@@ -157,6 +167,8 @@ class HTTPServer:
 
 if __name__ == "__main__":
 
+    http_version = 'HTTP/' + '1.1' if (sys.argv[-1] == '1.1') else '1.0'
+
     host = 'localhost'
     port = 8010
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -165,5 +177,5 @@ if __name__ == "__main__":
     srv.listen(1)
     print("Server iniciado http://%s:%s" % (host, port))
     while True:
-        HTTPServer(srv, host, port)
+        HTTPServer(srv, host, port, http_version)
     print("Server detenido.")
