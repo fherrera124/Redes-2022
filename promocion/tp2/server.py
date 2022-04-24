@@ -149,11 +149,10 @@ class HTTPServer:
             if (self.command == 'GET'):
                 body = ('<HTML><H1>%s</H1></HTML>\n\n' % self.path)
                 body = body.encode('utf-8')
-                
                 rta = '%s 200 OK\n' % self.protocol_version
                 rta += 'Date: %s\n' % date_time
                 rta += 'Server: Redes-2021/grupo-z\n'
-                rta += 'Content-Length: %x\n' % len(body)
+                rta += 'Content-Length: %s\n' % len(body)
                 rta += 'Content-Type: text/html\n'
                 rta += 'Connection: %s\n\n' % (
                     'close' if self.close_connection else 'keep-alive')
