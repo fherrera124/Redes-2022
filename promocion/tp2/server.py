@@ -147,21 +147,26 @@ class HTTPServer:
         success = True
         if self.command in metodos_validos:
             if (self.command == 'GET'):
+                body = ('<HTML><H1>%s</H1></HTML>\n\n' % self.path)
+                body = body.encode('utf-8')
+                
                 rta = '%s 200 OK\n' % self.protocol_version
                 rta += 'Date: %s\n' % date_time
                 rta += 'Server: Redes-2021/grupo-z\n'
-                rta += 'Content-Length: 00\n'
+                rta += 'Content-Length: %x\n' % len(body)
                 rta += 'Content-Type: text/html\n'
                 rta += 'Connection: %s\n\n' % (
                     'close' if self.close_connection else 'keep-alive')
-                rta += '<HTML><H1>%s</H1></HTML>\n\n' % self.path
+                rta = rta.encode('utf-8')
+                rta += body
+                
             else:
                 success = False
-                rta = '%s 405 METHOD NOT ALLOWED\n' % self.protocol_version
+                rta = ('%s 405 METHOD NOT ALLOWED\n' % self.protocol_version).encode('utf-8')
         else:
             success = False
-            rta = '%s 400 BAD REQUEST\n' % self.protocol_version
-        self.connection.send(rta.encode('utf-8'))
+            rta = ('%s 400 BAD REQUEST\n' % self.protocol_version).encode('utf-8')
+        self.connection.send(rta)
         return success
 
 
