@@ -1,20 +1,23 @@
 from time import time
 import socket
 import http.client
-from http import HTTPStatus
 import sys
 from email.utils import formatdate
 
 
 class HTTPServer:
-    """  Soporta versiones HTTP/1.0 y HTTP/1.1 !!
-    si protocol_version = "HTTP/1.0", la conexion se cierra, salvo que el cliente
-    envie en cada consulta, el encabezado Connection: keep-alive
+    """
+    Soporta versiones HTTP/1.0 y HTTP/1.1 !!
+    
+    - Si la version del protocolo es la 1.0, la conexion se cierra, salvo que el cliente
+    en cada consulta envie el header [Connection: keep-alive]
 
-    si protocol_version = "HTTP/1.1", la conexion NO se cierra, salvo que el cliente
-    envie el encabezado Connection: close
+    - Si la version del protocolo es la 1.1, la conexion NO se cierra, salvo que el cliente
+    en cada consulta envie el header [Connection: close]
 
-    por defecto mantiene la conexion de inactividad con el socket de 100 segundos
+    ----
+    
+    - Por defecto cierra la conexion con el socket despues de 100 segundos de inactividad
     """
 
     def __init__(self, socket, host, port, http_version="HTTP/1.0"):
@@ -56,7 +59,9 @@ class HTTPServer:
         return True
 
     def setup(self):
-        if self.timeout is not None:
+        if self.timeout is None:
+            self.connection.settimeout(0)
+        else:
             self.connection.settimeout(self.timeout)
 
     def handle(self):
@@ -71,13 +76,6 @@ class HTTPServer:
         self.close_connection = self.default_close_connection()
         try:
             self.raw_requestline = self.rfile.readline(65537)
-            if len(self.raw_requestline) > 65536:
-                self.requestline = ''
-                self.request_version = ''
-                self.command = ''
-                connection.send(HTTPStatus.REQUEST_URI_TOO_LONG)
-                # self.send_error(HTTPStatus.REQUEST_URI_TOO_LONG)
-                return
 
             if not self.raw_requestline:
                 self.close_connection = True
@@ -152,19 +150,22 @@ class HTTPServer:
                 rta = '%s 200 OK\n' % self.protocol_version
                 rta += 'Date: %s\n' % date_time
                 rta += 'Server: Redes-2021/grupo-z\n'
+                # es clave informar la cantidad de bytes
                 rta += 'Content-Length: %s\n' % len(body)
                 rta += 'Content-Type: text/html\n'
                 rta += 'Connection: %s\n\n' % (
                     'close' if self.close_connection else 'keep-alive')
                 rta = rta.encode('utf-8')
                 rta += body
-                
+
             else:
                 success = False
-                rta = ('%s 405 METHOD NOT ALLOWED\n' % self.protocol_version).encode('utf-8')
+                rta = ('%s 405 METHOD NOT ALLOWED\n' %
+                       self.protocol_version).encode('utf-8')
         else:
             success = False
-            rta = ('%s 400 BAD REQUEST\n' % self.protocol_version).encode('utf-8')
+            rta = ('%s 400 BAD REQUEST\n' %
+                   self.protocol_version).encode('utf-8')
         self.connection.send(rta)
         return success
 
