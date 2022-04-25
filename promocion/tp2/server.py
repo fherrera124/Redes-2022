@@ -77,15 +77,18 @@ class HTTPServer:
         try:
             self.raw_requestline = self.rfile.readline(65537)
 
-            if not self.raw_requestline or\
-                    not self.parse_request() or\
-                    not self.handle_command():
+            if not self.raw_requestline:
                 self.close_connection = True
                 return
 
             if (self.raw_requestline.strip() == b''):
                 # si el cliente ingresa blancos, no
-                # cerramos la conexion si estamos en 1.1
+                # forzamos el cierre de la conexión
+                return
+
+            if not self.parse_request() or\
+                    not self.handle_command():
+                self.close_connection = True
                 return
 
         except socket.timeout as e:
@@ -100,8 +103,6 @@ class HTTPServer:
         requestline = str(self.raw_requestline, 'iso-8859-1')
         self.requestline = requestline.rstrip('\r\n')
         words = requestline.split()
-        if len(words) == 0:
-            return False
         if len(words) >= 3:  # Suficiente para determinar la version de protocolo
             version = words[-1]
             try:
