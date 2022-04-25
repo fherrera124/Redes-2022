@@ -43,10 +43,8 @@ class HTTPServer:
 
         print("Esperando que se conecte un cliente")
         self.connection, self.address = self.socket.accept()  # blocking wait for client
-        print("Cliente conectado")
+        print("Cliente conectado!")
         self.setup()
-        self.rfile = self.connection.makefile('rb', 0)
-        self.request = self.connection
         try:
             self.handle()
         finally:
@@ -59,6 +57,8 @@ class HTTPServer:
         return True
 
     def setup(self):
+        self.rfile = self.connection.makefile('rb', 0)
+
         if self.timeout is None:
             self.connection.settimeout(0)
         else:
