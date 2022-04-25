@@ -173,14 +173,13 @@ class HTTPServer:
 if __name__ == "__main__":
 
     http_version = 'HTTP/' + '1.1' if (sys.argv[-1] == '1.1') else '1.0'
-
-    host = 'localhost'
+    host = '' # listen to incoming connection from any ip (set 'localhost' for local)
     port = 8010
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     srv.bind((host, port))
     srv.listen(1)
-    print("Server iniciado http://%s:%s" % (host, port))
+    print("Server iniciado en puerto %s" % port)
     while True:
         HTTPServer(srv, host, port, http_version)
     print("Server detenido.")
