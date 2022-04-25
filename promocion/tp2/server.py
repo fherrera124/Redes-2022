@@ -8,7 +8,7 @@ from email.utils import formatdate
 class HTTPServer:
     """
     Soporta versiones HTTP/1.0 y HTTP/1.1 !!
-    
+
     - Si la version del protocolo es la 1.0, la conexion se cierra, salvo que el cliente
     en cada consulta envie el header [Connection: keep-alive]
 
@@ -16,7 +16,7 @@ class HTTPServer:
     en cada consulta envie el header [Connection: close]
 
     ----
-    
+
     - Por defecto cierra la conexion con el socket despues de 100 segundos de inactividad
     """
 
@@ -77,19 +77,15 @@ class HTTPServer:
         try:
             self.raw_requestline = self.rfile.readline(65537)
 
-            if not self.raw_requestline:
+            if not self.raw_requestline or\
+                    not self.parse_request() or\
+                    not self.handle_command():
                 self.close_connection = True
                 return
 
             if (self.raw_requestline.strip() == b''):
                 # si el cliente ingresa blancos, no
                 # cerramos la conexion si estamos en 1.1
-                return
-
-            if not self.parse_request() or \
-                    not self.handle_command():
-                # An error code has been sent, just exit
-                self.close_connection = True
                 return
 
         except socket.timeout as e:
@@ -115,8 +111,8 @@ class HTTPServer:
                 error = "\n400, Bad request version: (%r)\n" % version
                 self.connection.send(error.encode('utf-8'))
                 return False
-            if version == 'HTTP/1.1' and self.protocol_version == "HTTP/1.1":  # evaluar si eliminar
-                self.close_connection = False
+            # if version == 'HTTP/1.1' and self.protocol_version == "HTTP/1.1":  # CONSULTAR
+            #    self.close_connection = False
             self.request_version = version
 
         if not 2 <= len(words) <= 3:
@@ -173,7 +169,8 @@ class HTTPServer:
 if __name__ == "__main__":
 
     http_version = 'HTTP/' + '1.1' if (sys.argv[-1] == '1.1') else '1.0'
-    host = '' # listen to incoming connection from any ip (set 'localhost' for local)
+    # listen to incoming connection from any ip (set 'localhost' for local)
+    host = ''
     port = 8010
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
