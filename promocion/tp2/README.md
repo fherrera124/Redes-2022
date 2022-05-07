@@ -9,10 +9,66 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
 `python3 server.py 1.1`
 
 
-
 ## Casos de prueba
+-Para la entrada:
+    $ telnet localhost 80
+    GET /index.html HTTP/1.0
+-Su respuesta debe ser:
+    HTTP/1.0 200 OK
+    Date: Sat, 07 May 2022 16:07:46 GMT
+    Server: Redes-2021/grupo-z
+    Content-Length: 35
+    Content-Type: text/html
+    Connection: close
+    <HTML><H1>/index.html</H1></HTML>
+    
+    Se ha perdido la conexión con el host.
+-Notar que como es HTTP 1.0 la conexión se cierra de manera automática.
 
-...
+-Para la entrada:
+    $ telnet localhost 80
+    GET dir/subdir/test.html HTTP/1.1
+    Host: 127.0.0.1:8000
+    Connection: keep-alive
+    User-Agent: Mozilla/5.0 (X11; Linux x86_64)
+-La respuesta debe ser:   
+    HTTP/1.0 200 OK
+    Date: Sat, 07 May 2022 16:12:09 GMT
+    Server: Redes-2021/grupo-z
+    Content-Length: 44
+    Content-Type: text/html
+    Connection: close
+    
+    <HTML><H1>dir/subdir/test.html</H1></HTML>
+
+
+    Se ha perdido la conexión con el host.
+-Notar que a pesar de que se pide que la conexión se mantenga, no se lo permite, ya que en realidad se ignoran todas las otras cabeceras.
+
+-Para la entrada
+    $ telnet localhost 80
+    FFF /
+-La salida va a ser:
+    HTTP/1.0 400 BAD REQUEST
+
+    Se ha perdido la conexión con el host.
+
+-Para la entrada:
+    $ telnet localhost 80
+    ....GET
+-La salida va a ser:
+    HTTP/1.0 400 BAD REQUEST
+
+    Se ha perdido la conexión con el host.
+
+-Para la entrada:
+    $ telnet localhost 80
+    HEAD /index.html HTTP/1.0
+    
+-La salida va a ser:
+    HTTP/1.0 405 METHOD NOT ALLOWED
+
+    Se ha perdido la conexión con el host.
 
 ## Enunciado
 
