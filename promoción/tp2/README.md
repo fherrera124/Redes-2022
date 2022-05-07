@@ -69,6 +69,10 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
     HTTP/1.0 405 METHOD NOT ALLOWED
 
     Se ha perdido la conexión con el host.
+    
+-Ademas puede iniciar el server con algun parametro: HTTP/1.0 o HTTP/1.1, 1.0 es el por defecto
+-Si usted ejecuta en una terminal python server.py HTTP/1.1 y en otra terminal:
+    -Para la entrada:
 
 ## Enunciado
 
