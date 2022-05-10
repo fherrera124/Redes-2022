@@ -108,10 +108,10 @@ class HTTPServer:
         if len(words) >= 3:  # Suficiente para determinar la version de protocolo
             self.request_version = words[-1]
             try:
-                if version not in ('HTTP/1.0', 'HTTP/1.1'):
+                if self.request_version not in ('HTTP/1.0', 'HTTP/1.1'):
                     raise ValueError
             except (ValueError, IndexError):
-                error = "\n400, Bad request version: (%r)\n" % version
+                error = "\n400, Bad request version: (%r)\n" % self.request_version
                 self.connection.send(error.encode('utf-8'))
                 return False
 
