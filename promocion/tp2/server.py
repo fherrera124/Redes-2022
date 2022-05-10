@@ -36,7 +36,9 @@ class HTTPServer:
         else:
             self.protocol_version = "HTTP/1.0"
 
-        print("Protocolo: %s" % self.protocol_version)
+        self.request_version = self.protocol_version # asumimos misma version que el servidor
+
+        print("Protocolo por defecto: %s" % self.protocol_version)
 
         # cant de segundos de inactividad, None para infinito
         self.timeout = 100
@@ -99,12 +101,11 @@ class HTTPServer:
 
     def parse_request(self):
         self.command = None  # set in case of error on the first line
-        self.request_version = version = self.default_request_version
         requestline = str(self.raw_requestline, 'iso-8859-1')
         self.requestline = requestline.rstrip('\r\n')
         words = requestline.split()
         if len(words) >= 3:  # Suficiente para determinar la version de protocolo
-            version = words[-1]
+            self.request_version = words[-1]
             try:
                 if version not in ('HTTP/1.0', 'HTTP/1.1'):
                     raise ValueError
@@ -112,9 +113,11 @@ class HTTPServer:
                 error = "\n400, Bad request version: (%r)\n" % version
                 self.connection.send(error.encode('utf-8'))
                 return False
-            # if version == 'HTTP/1.1' and self.protocol_version == "HTTP/1.1":  # CONSULTAR
-            #    self.close_connection = False
-            self.request_version = version
+            
+            if self.request_version == "HTTP/1.1":
+                self.close_connection = False
+            else:
+                self.close_connection = True
 
         if not 2 <= len(words) <= 3:
             rta = '%s 400 BAD REQUEST\n' % self.protocol_version
@@ -144,7 +147,7 @@ class HTTPServer:
             if (self.command == 'GET'):
                 body = ('<HTML><H1>%s</H1></HTML>\n\n' % self.path)
                 body = body.encode('utf-8')
-                rta = '%s 200 OK\n' % self.protocol_version
+                rta = '%s 200 OK\n' % self.request_version
                 rta += 'Date: %s\n' % date_time
                 rta += 'Server: Redes-2021/grupo-z\n'
                 # es clave informar la cantidad de bytes
