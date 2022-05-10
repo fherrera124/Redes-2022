@@ -36,7 +36,8 @@ class HTTPServer:
         else:
             self.protocol_version = "HTTP/1.0"
 
-        self.request_version = self.protocol_version # asumimos misma version que el servidor
+        # asumimos misma version que el servidor
+        self.request_version = self.protocol_version
 
         print("Protocolo por defecto: %s" % self.protocol_version)
 
@@ -113,7 +114,7 @@ class HTTPServer:
                 error = "\n400, Bad request version: (%r)\n" % version
                 self.connection.send(error.encode('utf-8'))
                 return False
-            
+
             if self.request_version == "HTTP/1.1":
                 self.close_connection = False
             else:
@@ -138,7 +139,8 @@ class HTTPServer:
         return True
 
     def handle_command(self):
-        metodos_validos = ('GET', 'POST', 'PUT', 'HEAD', 'DELETE', 'PATCH')
+        metodos_validos = ('GET', 'POST', 'PUT', 'HEAD',
+                           'DELETE', 'PATCH', 'CONNECT', 'OPTIONS', 'TRACE')
         # formato de fecha segun RFC 2822
         date_time = formatdate(time(), usegmt=True)
 
