@@ -72,7 +72,7 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
     
 -Ademas puede iniciar el server con algun parametro: HTTP/1.0 o HTTP/1.1, 1.0 es el por defecto
 
--Si usted ejecuta en una terminal python server.py HTTP/1.1 y en otra terminal:
+-Si usted ejecuta en una terminal python server.py HTTP/1.1 la conexion seguira activa, por lo que puede mandar más consultas.
     -Para la entrada:
         GET index.html HTTP/1.1
     -La salida va a ser:
@@ -84,7 +84,29 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
         Connection: keep-alive
 
         <HTML><H1>index.html</H1></HTML>
+        
+    -Si pasan mas de 100 segundos la conexión se cierra automáticamente mostrando el mensaje:
+        
+    -Si esperan 100 segundos sin enviar una consulta:
+    
+    -La salida del lado del servidor va a ser:
+        127.0.0.1 - - timed out
+        
+    -Para la entrada:
+        GET H HTTP/1.0
+    -La salida será:
+        HTTP/1.0 200 OK
+        Date: Thu, 26 May 2022 19:40:34 GMT
+        Server: Redes-2021/grupo-z
+        Content-Length: 25
+        Content-Type: text/html
+        Connection: close
 
+        <HTML><H1>H</H1></HTML>
+
+
+
+Se ha perdido la conexión con el host.
         
 ## Enunciado
 
