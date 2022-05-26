@@ -75,7 +75,7 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
 -Si usted ejecuta en una terminal python server.py HTTP/1.1 la conexion seguira activa, por lo que puede mandar más consultas.
     -Para la entrada:
         GET index.html HTTP/1.1
-    -La salida va a ser:
+    -La salida va a ser (se puede seguir mandando consultas):
         HTTP/1.1 200 OK
         Date: Thu, 26 May 2022 19:23:22 GMT
         Server: Redes-2021/grupo-z
@@ -92,7 +92,7 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
     -La salida del lado del servidor va a ser:
         127.0.0.1 - - timed out
         
-    -Para la entrada:
+    -Para la entrada (se solicita usar el protocolo HTTP/1.0):
         GET H HTTP/1.0
     -La salida será:
         HTTP/1.0 200 OK
@@ -103,6 +103,21 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
         Connection: close
 
         <HTML><H1>H</H1></HTML>
+
+        Se ha perdido la conexión con el host.
+        
+    -Para la entrada (se solicita que se cierre la conexion): 
+        GET G HTTP/1.1
+        Connection: close
+    -La salida va a ser:
+        HTTP/1.1 200 OK
+        Date: Thu, 26 May 2022 19:44:34 GMT
+        Server: Redes-2021/grupo-z
+        Content-Length: 25
+        Content-Type: text/html
+        Connection: close
+
+        <HTML><H1>G</H1></HTML>
 
 
 
