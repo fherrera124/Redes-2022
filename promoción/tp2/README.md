@@ -71,9 +71,21 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
     Se ha perdido la conexión con el host.
     
 -Ademas puede iniciar el server con algun parametro: HTTP/1.0 o HTTP/1.1, 1.0 es el por defecto
+
 -Si usted ejecuta en una terminal python server.py HTTP/1.1 y en otra terminal:
     -Para la entrada:
+        GET index.html HTTP/1.1
+    -La salida va a ser:
+        HTTP/1.1 200 OK
+        Date: Thu, 26 May 2022 19:23:22 GMT
+        Server: Redes-2021/grupo-z
+        Content-Length: 38
+        Content-Type: text/html
+        Connection: keep-alive
 
+        <HTML><H1>index.html</H1></HTML>
+
+        
 ## Enunciado
 
 12. (Ejercicio de promoción) Programar en el lenguaje que sea de su elección un servidor HTTP/1.0
