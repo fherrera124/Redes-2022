@@ -1,5 +1,10 @@
 
 
+## Breve descripción:
+
+Este programa tiene en cuenta versiones de HTTP/1.0 y HTTP/1.1. Dependiendo de la versión,
+evaluará si cerrar la conexión o no.
+
 ## Modo de uso:
 
 `python3 server.py `
@@ -10,10 +15,15 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
 
 
 ## Casos de prueba
--Para la entrada:
-    $ telnet localhost 80
+
+A continuación listamos algunos casos de pruebas más ineresantes:
+
+#### Caso 1
+
+##### Para la entrada:
+    $ telnet localhost 8010
     GET /index.html HTTP/1.0
--Su respuesta debe ser:
+##### Su respuesta debe ser:
     HTTP/1.0 200 OK
     Date: Sat, 07 May 2022 16:07:46 GMT
     Server: Redes-2021/grupo-z
@@ -25,57 +35,52 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
     Se ha perdido la conexión con el host.
 -Notar que como es HTTP 1.0 la conexión se cierra de manera automática.
 
--Para la entrada:
-    $ telnet localhost 80
-    GET dir/subdir/test.html HTTP/1.1
-    Host: 127.0.0.1:8000
+#### Caso 2
+##### Para la entrada:
+    $ telnet localhost 8010
+    GET prueba-de-uso/ok.html HTTP/1.1
+##### La respuesta debe ser:
+    HTTP/1.1 200 OK
+    Date: Fri, 27 May 2022 02:06:02 GMT
+    Server: Redes-2021/grupo-z
+    Content-Length: 45
+    Content-Type: text/html
     Connection: keep-alive
-    User-Agent: Mozilla/5.0 (X11; Linux x86_64)
--La respuesta debe ser:   
+
+    <HTML><H1>prueba-de-uso/ok.html</H1></HTML>
+
+Notar que la conexión no se cierra a pesar de que el servidor se inició por defecto con la versión HTTP/1.0. En cambio responde con la versión de HTTP/1.1 como se solicitó explícitamente ( HTTP/1.1 200 OK ), y mantiene la conexión abierta. En este momento se puede realizar otra consulta. IMPORTANTE: recordar que la versión con la que está corriendo el servidor es 1.0, por lo que si no se vuelve a pedir explicitamente por la version 1.1 en la siguiente consulta, la conexión se cerrará por defecto.
+    
+
+#### Caso 3
+
+##### Para la entrada:
+    $ telnet localhost 8010
+    GET dir/subdir/test.html
+    Connection: keep-alive
+##### La respuesta debe ser:
     HTTP/1.0 200 OK
     Date: Sat, 07 May 2022 16:12:09 GMT
     Server: Redes-2021/grupo-z
     Content-Length: 44
     Content-Type: text/html
-    Connection: close
+    Connection: keep-alive
     
     <HTML><H1>dir/subdir/test.html</H1></HTML>
 
 
-    Se ha perdido la conexión con el host.
--Notar que a pesar de que se pide que la conexión se mantenga, no se lo permite, ya que en realidad se ignoran todas las otras cabeceras.
+Notar que la conexión no se cierra, pero a diferencia que el ejemplo anterior, la respuesta dice "HTTP/1.0 200 OK", es decir, respondió con la versión por defecto, pero como nosotros para la versión HTTP/1.0 tenemos implementada la instrucción keep-alive, entonces la conexión no se cierra. Parecida a la aclaración para el ejemplo anterior, si no se vuelve a enviar la cabezera keep-alive en la siguiente consulta, la conexión se cerrará por defecto.
 
--Para la entrada
-    $ telnet localhost 80
-    FFF /
--La salida va a ser:
-    HTTP/1.0 400 BAD REQUEST
 
-    Se ha perdido la conexión con el host.
+#### Modo HTTP/1.1  
+Puede iniciar el server con algun parametro: 1.0 o 1.1, 1.0 es el por defecto
 
--Para la entrada:
-    $ telnet localhost 80
-    ....GET
--La salida va a ser:
-    HTTP/1.0 400 BAD REQUEST
+Si usted ejecuta en una terminal  `python server.py 1.1 ` la conexion seguira activa, por lo que puede mandar más consultas.
 
-    Se ha perdido la conexión con el host.
-
--Para la entrada:
-    $ telnet localhost 80
-    HEAD /index.html HTTP/1.0
-    
--La salida va a ser:
-    HTTP/1.0 405 METHOD NOT ALLOWED
-
-    Se ha perdido la conexión con el host.
-    
--Ademas puede iniciar el server con algun parametro: HTTP/1.0 o HTTP/1.1, 1.0 es el por defecto
-
--Si usted ejecuta en una terminal python server.py HTTP/1.1 la conexion seguira activa, por lo que puede mandar más consultas.
-    -Para la entrada:
+#### Caso 4
+##### Para la entrada:
         GET index.html HTTP/1.1
-    -La salida va a ser (se puede seguir mandando consultas):
+##### La salida va a ser (se puede seguir mandando consultas):
         HTTP/1.1 200 OK
         Date: Thu, 26 May 2022 19:23:22 GMT
         Server: Redes-2021/grupo-z
@@ -84,17 +89,21 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
         Connection: keep-alive
 
         <HTML><H1>index.html</H1></HTML>
+
+La conexión no se cierra.
+
+#### Caso 5
         
-    -Si pasan mas de 100 segundos la conexión se cierra automáticamente mostrando el mensaje:
-        
-    -Si esperan 100 segundos sin enviar una consulta:
+##### Si esperan 100 segundos sin enviar una consulta
     
-    -La salida del lado del servidor va a ser:
+##### La salida del lado del servidor va a ser:
         127.0.0.1 - - timed out
-        
-    -Para la entrada (se solicita usar el protocolo HTTP/1.0):
+
+#### Caso 6
+
+##### Para la entrada (se solicita usar el protocolo HTTP/1.0):
         GET H HTTP/1.0
-    -La salida será:
+##### La salida será:
         HTTP/1.0 200 OK
         Date: Thu, 26 May 2022 19:40:34 GMT
         Server: Redes-2021/grupo-z
@@ -105,11 +114,15 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
         <HTML><H1>H</H1></HTML>
 
         Se ha perdido la conexión con el host.
-        
-    -Para la entrada (se solicita que se cierre la conexion): 
+    
+    Notar que se cerró la conexión, pues se solicitó la versión 1.0.
+
+#### Caso 7
+
+##### Para la entrada (se solicita que se cierre la conexion): 
         GET G HTTP/1.1
         Connection: close
-    -La salida va a ser:
+##### La salida va a ser:
         HTTP/1.1 200 OK
         Date: Thu, 26 May 2022 19:44:34 GMT
         Server: Redes-2021/grupo-z
@@ -119,9 +132,47 @@ Por defecto se iniciara el servidor con HTTP/1.0, para utilizar HTTP/1.1 ejecuta
 
         <HTML><H1>G</H1></HTML>
 
+        Se ha perdido la conexión con el host.
+    
+    Notar que se cerró la conexión, pues se envió la cabecera close.
 
 
-Se ha perdido la conexión con el host.
+#### Respuesta ante errores en la consulta
+
+Tanto para la versión 1.0 como 1.1, los siguientes errores son devueltos por el servidor ante consultas erróneas por parte del cliente.
+
+#### Caso 8
+
+##### Para la entrada
+    $ telnet localhost 8010
+    FFF /
+##### La salida va a ser:
+    HTTP/1.0 400 BAD REQUEST
+
+    Se ha perdido la conexión con el host.
+
+#### Caso 9
+
+##### Para la entrada:
+    $ telnet localhost 8010
+    ....GET
+
+##### La salida va a ser:
+    HTTP/1.0 400 BAD REQUEST
+
+    Se ha perdido la conexión con el host.
+
+#### Caso 10
+
+##### Para la entrada:
+    $ telnet localhost 8010
+    HEAD /index.html HTTP/1.0
+    
+##### La salida va a ser:
+    HTTP/1.0 405 METHOD NOT ALLOWED
+
+    Se ha perdido la conexión con el host.
+
         
 ## Enunciado
 

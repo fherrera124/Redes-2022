@@ -7,15 +7,16 @@ from email.utils import formatdate
 
 class HTTPServer:
     """
-    Soporta versiones HTTP/1.0 y HTTP/1.1 !!
+    Esta clase representa a un servidor HTTP, implementado por nosotros mediante la
+    conexión con un socket TCP.
 
-    - Si la version del protocolo es la 1.0, la conexion se cierra, salvo que el cliente
-    en cada consulta envie el header [Connection: keep-alive]
+    Soporta versiones HTTP/1.0 y HTTP/1.1
+
+    - Si la version del protocolo es la 1.0, la conexion se cierra luego de la consulta,
+    salvo que el cliente en cada consulta envie el header [Connection: keep-alive]
 
     - Si la version del protocolo es la 1.1, la conexion NO se cierra, salvo que el cliente
     en cada consulta envie el header [Connection: close]
-
-    ----
 
     - Por defecto cierra la conexion con el socket despues de 100 segundos de inactividad
     """
@@ -86,7 +87,8 @@ class HTTPServer:
 
             if (self.raw_requestline.strip() == b''):
                 # si el cliente ingresa blancos, no
-                # forzamos el cierre de la conexión
+                # forzamos el cierre de la conexión.
+                # Como vimos que hace google.com.
                 return
 
             if not self.parse_request() or\
@@ -95,13 +97,13 @@ class HTTPServer:
                 return
 
         except socket.timeout as e:
-            # a read or a write timed out. Discard this connection
+            # read o write timed out. Descartamos la conexión
             sys.stderr.write("%s - - %s\n" % (self.address[0], e))
             self.close_connection = True
             return
 
     def parse_request(self):
-        self.command = None  # set in case of error on the first line
+        self.command = None
         requestline = str(self.raw_requestline, 'iso-8859-1')
         self.requestline = requestline.rstrip('\r\n')
         words = requestline.split()
@@ -152,7 +154,8 @@ class HTTPServer:
                 rta = '%s 200 OK\n' % self.request_version
                 rta += 'Date: %s\n' % date_time
                 rta += 'Server: Redes-2021/grupo-z\n'
-                # es clave informar la cantidad de bytes
+                # es clave informar la cantidad de bytes, al menos
+                # en los browsers, donde notamos comportamientos erroneos
                 rta += 'Content-Length: %s\n' % len(body)
                 rta += 'Content-Type: text/html\n'
                 rta += 'Connection: %s\n\n' % (
@@ -175,7 +178,8 @@ class HTTPServer:
 if __name__ == "__main__":
 
     http_version = 'HTTP/' + '1.1' if (sys.argv[-1] == '1.1') else '1.0'
-    # listen to incoming connection from any ip (set 'localhost' for local)
+    # escuchamos por conexiones entrantes desde cualquier ip
+    # setear a 'localhost' para solo local.
     host = ''
     port = 8010
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
